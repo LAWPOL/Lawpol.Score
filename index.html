@@ -15,6 +15,11 @@
         .score-section { background-color: #f8f9fa; border-radius: 8px; padding: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 20px; }
         .section-title { border-bottom: 2px solid #0043a7; padding-bottom: 10px; margin-bottom: 15px; color: #0d6efd; font-weight: bold; }
 
+        /* สไตล์สำหรับกล่องสถิติที่เพิ่มเข้ามา */
+        .stat-box { background-color: #fff; border-radius: 8px; padding: 15px; text-align: center; border: 1px solid #dee2e6; box-shadow: 0 1px 3px rgba(0,0,0,0.05); height: 100%; }
+        .stat-title { font-size: 0.9rem; color: #6c757d; margin-bottom: 5px; font-family: 'Sarabun', sans-serif;}
+        .stat-value { font-size: 1.6rem; font-weight: bold; margin-bottom: 0; font-family: 'Sarabun', sans-serif;}
+
         .rainbow-text {
         background: linear-gradient(
         90deg, 
@@ -56,7 +61,7 @@
                     <div id="loading" class="text-primary mt-3" style="display: none;">
                         <div class="spinner-border spinner-border-sm" role="status"></div> กำลังค้นหาข้อมูล...
                     </div>
-                    <div id="errorMsg" class="text-danger mt-3" style="display: none;">ไม่พบข้อมูล รุณาตรวจสอบเลขบัตรประชาชนอีกครั้ง</div>
+                    <div id="errorMsg" class="text-danger mt-3" style="display: none;">ไม่พบข้อมูล กรุณาตรวจสอบเลขบัตรประชาชนอีกครั้ง</div>
                 </div>
             </div>
 
@@ -64,13 +69,44 @@
                 
                 <div class="score-section border-top border-primary border-4">
                     <h5 class="fw-bold">ข้อมูลผู้เข้าสอบ</h5>
-                    <div class="row mt-3">
+                    <div class="row mt-3" style="font-family: 'Sarabun', sans-serif;">
                         <div class="col-sm-6"><p><strong>เลขที่เข้าสอบ:</strong> <span id="res-exam-no"></span></p></div>
                         <div class="col-sm-6"><p><strong>ชื่อ-สกุล:</strong> <span id="res-name"></span></p></div>
                     </div>
                 </div>
 
                 <div class="score-section">
+                    <h5 class="section-title" style="border-color: #17a2b8; color: #17a2b8;">สถิติภาพรวมผู้เข้าสอบ</h5>
+                    <div class="row g-2">
+                        <div class="col-6 col-md-3">
+                            <div class="stat-box" style="border-left: 4px solid #0d6efd;">
+                                <div class="stat-title">อันดับที่</div>
+                                <div class="stat-value text-primary" id="res-rank">-</div>
+                                <div style="font-size: 0.75rem; color: #6c757d;" id="res-total-students"></div>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <div class="stat-box" style="border-left: 4px solid #198754;">
+                                <div class="stat-title">คะแนนสูงสุด</div>
+                                <div class="stat-value text-success" id="res-max">-</div>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <div class="stat-box" style="border-left: 4px solid #ffc107;">
+                                <div class="stat-title">ค่าเฉลี่ย</div>
+                                <div class="stat-value text-warning" id="res-avg">-</div>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <div class="stat-box" style="border-left: 4px solid #dc3545;">
+                                <div class="stat-title">คะแนนต่ำสุด</div>
+                                <div class="stat-value text-danger" id="res-min">-</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="score-section" style="font-family: 'Sarabun', sans-serif;">
                     <h5 class="section-title">ตอนที่ 1 วิชาสามัญ (100 คะแนน)</h5>
                     <table class="table table-sm">
                         <tr><td>คณิตศาสตร์</td><td class="text-end" id="res-math"></td></tr>
@@ -82,7 +118,7 @@
                     </table>
                 </div>
 
-                <div class="score-section">
+                <div class="score-section" style="font-family: 'Sarabun', sans-serif;">
                     <h5 class="section-title">ตอนที่ 2 ความถนัดทางนิติศาสตร์ - รัฐศาสตร์ (80 คะแนน)</h5>
                     <table class="table table-sm">
                         <tr><td>พื้นฐานนิติศาสตร์</td><td class="text-end" id="res-law"></td></tr>
@@ -93,7 +129,7 @@
                     </table>
                 </div>
 
-                <div class="score-section bg-light">
+                <div class="score-section bg-light" style="font-family: 'Sarabun', sans-serif;">
                     <table class="table table-borderless mb-0">
                         <tr class="fs-5">
                             <td><strong>สอบสัมภาษณ์ (20 คะแนน) :</strong></td>
@@ -170,8 +206,18 @@
                 if (data.status === 'success') {
                     // นำข้อมูลไปแสดงผล
                     const d = data.data;
+                    const stats = data.stats; // รับค่าสถิติจาก Backend
+
                     document.getElementById('res-exam-no').innerText = d.exam_no;
                     document.getElementById('res-name').innerText = d.name;
+                    
+                    // แสดงผลสถิติ
+                    document.getElementById('res-rank').innerText = stats.rank;
+                    document.getElementById('res-total-students').innerText = 'จาก ' + stats.total_students + ' คน';
+                    document.getElementById('res-max').innerText = stats.max;
+                    document.getElementById('res-min').innerText = stats.min;
+                    document.getElementById('res-avg').innerText = stats.avg;
+
                     document.getElementById('res-math').innerText = d.math;
                     document.getElementById('res-science').innerText = d.science;
                     document.getElementById('res-english').innerText = d.english;
@@ -205,7 +251,3 @@
 </script>
 </body>
 </html>
-
-
-
-
